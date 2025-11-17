@@ -1,0 +1,21 @@
+[Unit]
+Description=DHCP Dashboard Web Service
+After=network.target mysql.service
+Wants=mysql.service
+
+[Service]
+Type=exec
+User=www-data
+Group=www-data
+WorkingDirectory=/home/jose/dhcp-gestion
+Environment=PATH=/home/jose/dhcp-gestion/venv/bin
+ExecStart=/home/jose/dhcp-gestion/venv/bin/gunicorn --config gunicorn.conf.py app:app
+ExecReload=/bin/kill -s HUP $MAINPID
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=dhcp-dashboard
+
+[Install]
+WantedBy=multi-user.target
