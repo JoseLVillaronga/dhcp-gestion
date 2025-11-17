@@ -282,4 +282,14 @@ sudo chmod 644 /var/lib/dhcp/dhcpd.leases
 
 ## 📝 Licencia
 
-Proyecto de uso interno para gestión de leases DHCP.
+Este proyecto está licenciado bajo la Licencia MIT. Ver el archivo [LICENSE](LICENSE) para más detalles.
+
+### TL;DR
+- ✅ **Uso Comercial**: Puedes usarlo en productos comerciales
+- ✅ **Modificación**: Puedes modificar el código
+- ✅ **Distribución**: Puedes distribuir y vender copias
+- ✅ **Uso Privado**: Puedes usarlo privadamente
+- ❌ **Responsabilidad**: Sin garantía, uso bajo tu propio riesgo
+
+### Requisitos
+- Mantener el aviso de copyright en todas las copias
