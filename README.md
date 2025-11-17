@@ -7,12 +7,19 @@ Sistema completo para gestión y monitoreo de leases DHCP con sincronización au
 ```
 dhcp-gestion/
 ├── .env                    # Configuración de credenciales (no versionado)
+├── .env.example           # Plantilla de configuración
 ├── .gitignore             # Exclusiones de Git
+├── LICENSE                # Licencia MIT
 ├── requirements.txt       # Dependencias Python
 ├── README.md             # Este archivo
+├── create_mysql_schema.sql # Script para crear base de datos
 ├── update_dhcp_mysql.py  # Script de sincronización DHCP → MySQL
 ├── app.py                # Aplicación web Flask (dashboard)
 ├── start_dashboard.py    # Script de inicio con verificaciones
+├── install_service.sh    # Instalador automático de servicio
+├── uninstall_service.sh  # Desinstalador de servicio
+├── dhcp-dashboard.service # Plantilla de servicio systemd
+├── gunicorn.conf.py     # Configuración de Gunicorn
 └── templates/
     └── dashboard.html    # Interfaz web del dashboard
 ```
@@ -42,8 +49,16 @@ dhcp-gestion/
 
 ## ⚙️ Configuración
 
-### 1. Base de Datos
-Crea la base de datos y tabla necesaria:
+### 1. Base de Datos (Opción A: Script Automático)
+Ejecuta el script SQL proporcionado:
+
+```bash
+# Importar el esquema de base de datos
+mysql -u root -p < create_mysql_schema.sql
+```
+
+### 2. Base de Datos (Opción B: Manual)
+Crea la base de datos y tabla manualmente:
 
 ```sql
 CREATE DATABASE dhcp_leases_db;
@@ -51,32 +66,40 @@ USE dhcp_leases_db;
 
 CREATE TABLE active_leases (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    ip_address VARCHAR(15) NOT NULL,
+    ip_address VARCHAR(15) NOT NULL UNIQUE,
     mac_address VARCHAR(17) NOT NULL,
     hostname VARCHAR(255),
-    lease_start DATETIME,
-    lease_end DATETIME,
-    state VARCHAR(20),
-    INDEX idx_mac (mac_address),
-    INDEX idx_ip (ip_address)
+    lease_start DATETIME NOT NULL,
+    lease_end DATETIME NOT NULL,
+    state VARCHAR(20) NOT NULL,
+    last_update TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 ```
 
-### 2. Configuración de Entorno
-Copia y configura el archivo `.env`:
+### 3. Configuración de Entorno
+Copia la plantilla y configura tus credenciales:
 
+```bash
+# Copiar plantilla de configuración
+cp .env.example .env
+
+# Editar con tus credenciales reales
+nano .env
+```
+
+El archivo `.env` debe contener:
 ```bash
 # Configuración de base de datos MySQL
 DB_HOST=localhost
 DB_NAME=dhcp_leases_db
 DB_USER=dhcp_user
-DB_PASSWORD=tu_contraseña_aqui
+DB_PASSWORD=your_password_db
 
 # Ruta del archivo de leases DHCP
 LEASE_FILE=/var/lib/dhcp/dhcpd.leases
 ```
 
-### 3. Instalación de Dependencias
+### 4. Instalación de Dependencias
 ```bash
 pip install -r requirements.txt
 ```
